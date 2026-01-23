@@ -1,0 +1,3 @@
+"""
+Initializacja modułu tests
+"""
