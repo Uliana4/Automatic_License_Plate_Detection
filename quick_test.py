@@ -8,24 +8,12 @@ sys.path.insert(0, str(Path(__file__).parent))
 from utils.config import config
 from utils.annotation_parser import AnnotationParser
 from utils.evaluation import Evaluator
+from utils.plate_detector import PlateDetector
 import os
 
-# Fallback: użyj uproszczonego detektora jeśli EasyOCR nie działa
-# Spróbuj załadować EasyOCR, ale przejdź na OpenCV jeśli problemy
-use_simple = True  # Zmień na True aby wymusić OpenCV
-if not use_simple:
-    try:
-        from utils.plate_detector import PlateDetector
-        detector = PlateDetector(languages=config.OCR_LANGUAGES)
-        print("Inicjalizacja: EasyOCR")
-    except Exception as e:
-        print(f"⚠ EasyOCR niedostępny, używam OpenCV")
-        from utils.simple_detector import SimpleYOLOPlateDetector
-        detector = SimpleYOLOPlateDetector()
-else:
-    print("Konfiguracja: Uzywam OpenCV (szybsze, bardziej stabilne)")
-    from utils.simple_detector import SimpleYOLOPlateDetector
-    detector = SimpleYOLOPlateDetector()
+# Załaduj detektor z REAL OCR
+print("Inicjalizacja: PlateDetectorV2 (real OCR)")
+detector = PlateDetector(languages=config.OCR_LANGUAGES)
 
 print("=" * 60)
 print("QUICK TEST - Ewaluacja pierwszych 5 zdjęć")
