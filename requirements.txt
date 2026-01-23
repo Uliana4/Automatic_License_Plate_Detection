@@ -14,3 +14,4 @@ requests==2.31.0
 tqdm==4.66.1
 scikit-image==0.22.0
 pytesseract==0.3.13
+# Opcjonalnie dla lepszej dokładności: pip install paddleocr
