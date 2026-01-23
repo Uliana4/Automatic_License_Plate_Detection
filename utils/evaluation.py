@@ -178,6 +178,17 @@ class Evaluator:
         print("=" * 60)
         print("RAPORT EWALUACJI ALGORYTMU DETEKCJI TABLIC")
         print("=" * 60)
+        
+        if not metrics:
+            print("Brak danych do raportu - nie udała się żadna detekcja.")
+            print("Sprawdź:")
+            print("1. Czy zdjęcia są dostępne w folderze photos/")
+            print("2. Czy plik annotations.xml jest poprawny")
+            print("3. Spróbuj zainstalować EasyOCR ponownie:")
+            print("   pip install --upgrade easyocr")
+            print("=" * 60)
+            return
+        
         print(f"Całkowita liczba zdjęć: {metrics['total_images']}")
         print(f"Poprawnie odczytane tablice: {metrics['correct_plates']}")
         print(f"Dokładność (Accuracy): {metrics['accuracy_percent']:.2f}%")
