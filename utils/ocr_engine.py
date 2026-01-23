@@ -9,6 +9,7 @@ import time
 import string
 import re
 import threading
+import subprocess
 from typing import Tuple, Optional
 from dataclasses import dataclass
 
@@ -57,23 +58,20 @@ class OCREngine:
             print(f"[WARN] EasyOCR niedostepny: {str(e)[:50]}")
         
         # Spróbuj załadować Tesseract (OPCJA B - FALLBACK)
-        try:
-            import pytesseract
-            pytesseract.get_tesseract_version()
-            self.tesseract_available = True
-            print("[OK] Tesseract dostepny (B - rekomendacja)")
-        except Exception as e:
-            print(f"[WARN] Tesseract niedostepny: {str(e)[:50]}")
+        # UWAGA: Nie importuj tutaj - pytesseract ładuje pandas w tle!
+        # Zamiast tego spróbuj tylko w _ocr_tesseract() jeśli jest potrzebny
+        self.tesseract_available = False  # Ustaw na False - będzie testowany w _ocr_tesseract()
+        print("[INFO] Tesseract - będzie testowany w locie jeśli potrzebny")
         
-        # Opcjonalnie: Spróbuj załadować PaddleOCR (OPCJA C - BONUS)
+        # Opcjonalnie: Spróbuj załadować PaddleOCR (OPCJA C - BONUS, TERAZ GŁÓWNY FALLBACK)
         try:
             from paddleocr import PaddleOCR
             self.paddle_ocr = PaddleOCR(use_angle_cls=True, lang='en')
             self.paddle_available = True
-            print("[OK] PaddleOCR dostepny (C - opcjonalnie)")
-        except Exception:
-            # Cicho ignoruj - to opcjonalne
-            pass
+            print("[OK] PaddleOCR dostepny (C - opcjonalnie, jako fallback)")
+        except Exception as e:
+            self.paddle_available = False
+            print(f"[WARN] PaddleOCR niedostepny: {str(e)[:50]}")
     
     
     def recognize_plate(self, image: np.ndarray, plate_region: Optional[np.ndarray] = None) -> OCRResult:
@@ -105,15 +103,15 @@ class OCREngine:
             if result is not None:
                 return result
         
-        # Spróbuj Tesseract (OPCJA B - FALLBACK)
-        if self.tesseract_available:
-            result = self._ocr_tesseract(plate_region)
+        # Spróbuj PaddleOCR (OPCJA C - TERAZ GŁÓWNY FALLBACK)
+        if self.paddle_available:
+            result = self._ocr_paddle(plate_region)
             if result is not None:
                 return result
         
-        # Opcjonalnie spróbuj PaddleOCR (OPCJA C - BONUS)
-        if self.paddle_available:
-            result = self._ocr_paddle(plate_region)
+        # Spróbuj Tesseract (OPCJA B - OSTATNI FALLBACK)
+        if self.tesseract_available:
+            result = self._ocr_tesseract(plate_region)
             if result is not None:
                 return result
         
