@@ -208,7 +208,7 @@ docker-compose up -d
 
 ## Wyniki
 
-Po uruchomieniu ewaluacji zobaczysz raport:
+Po uruchomieniu ewaluacji widzimy raport:
 
 ```
 ============================================================
@@ -242,5 +242,4 @@ automatic_plate_number_recognition
 ```
 
 ## Autor
-
-Projekt stworzony na potrzeby zaliczenia.
+Uliana Kutylovskaya.
